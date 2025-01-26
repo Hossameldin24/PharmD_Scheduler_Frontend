@@ -1,0 +1,52 @@
+/* PreceptorForm.css */
+
+.preceptor-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the items */
+    font-family: 'Arial', sans-serif; /* Change the font to Arial */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9; /* Light background color */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    max-width: 800px; /* Set max width for the form */
+    margin: 20px auto; /* Center the form in the middle of the page */
+}
+
+.preceptor-form h2 {
+    margin-bottom: 20px;
+}
+
+.preceptor-form-input {
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%; /* Full width */
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Slightly round the corners */
+    font-size: 16px; /* Larger font size */
+}
+
+.preceptor-form select {
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%; /* Full width */
+    border: 1px solid #ccc;
+    border-radius: 5px; /* Slightly round the corners */
+    font-size: 16px; /* Larger font size */
+}
+
+.preceptor-form button {
+    padding: 10px 20px;
+    background-color: #007BFF; /* Blue background color */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Slightly round the corners */
+    font-size: 16px; /* Larger font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+.preceptor-form button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

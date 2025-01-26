@@ -1,0 +1,326 @@
+:root {
+    /* Color Palette */
+    --primary-color: #492c50; /* Dark Blue */
+    --secondary-color: #ecf0f1; /* Light Gray */
+    --accent-color: #f39c12; /* Gold */
+    --text-color: #34495e; /* Darker Gray */
+    --error-color: #e74c3c; /* Red */
+    --success-color: #27ae60; /* Green */
+    --background-color: #051155; /* White */
+    --white: #ffffff;
+    --error: #dc2626;
+    --error-light: #fee2e2;
+    --error-border: #fecaca;
+    --text-primary: #1a2980;
+    --text-secondary: #94a3b8;
+    --background-light: #f8fafc;
+    --border-color: #e2e8f0;
+  
+    /* Shadows */
+    --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.3);
+  
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 15px;
+    --radius-lg: 20px;
+  
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 2.5rem;
+  
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+  
+  /* Common Layout Styles */
+  .page-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+    padding: 20px;
+  }
+
+  
+    .navbar-logo {
+        height: 100px; /* Set a fixed height for the navbar logo */
+        margin-right: 50px; /* Space between logo and title */
+    }
+  
+  .content-box {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: var(--secondary-color);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .page-title {
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+  }
+  
+  /* Common Component Styles */
+  .button-primary {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  }
+  
+  .button-primary:hover {
+    background-color: #e67e22; /* Darker gold on hover */
+    transform: translateY(-2px); /* Lift effect */
+  }
+  
+  .input-field {
+    padding: 0.75rem;
+    border-radius: 5px; /* Slightly rounded */
+    border: 1px solid #bdc3c7; /* Light gray border */
+    width: 100%;
+    transition: border-color 0.3s;
+  }
+  
+  .input-field:focus {
+    border-color: var(--accent-color); /* Gold border on focus */
+    outline: none; /* Remove default outline */
+  }
+  
+  /* Card Styles */
+  .card {
+    background-color: var(--secondary-color);
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 20px;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Table Styles */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .table th {
+    background: var(--background-light);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  
+  /* Status Indicators */
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px; /* Rounded badges */
+    font-weight: bold;
+  }
+  
+  .status-success {
+    background-color: #dff0d8; /* Light green */
+    color: #3c763d; /* Dark green */
+  }
+  
+  .status-pending {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  
+  .status-error {
+    background-color: #f2dede; /* Light red */
+    color: #a94442; /* Dark red */
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: -20pt -20pt 60pt -20pt;
+    padding: 0.75rem 2rem;
+    background-color: #f0f0f0; /* Dark Navy */
+    color: #ffffff; /* White */
+}
+
+.navbar-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #051155;
+    text-align: center;
+}
+
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.navbar-links li {
+    display: inline;
+}
+
+.button-primary {
+    background-color: #051155; /* Rich Coral */
+    color: #ffffff; /* White */
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.button-primary:hover {
+    background-color: #1a2980; /* Darker coral on hover */
+    transform: translateY(-2px); /* Lift effect */
+}
+
+.button-primary:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.5); /* Focus effect */
+}
+  
+  /* Add this to your existing theme.css or create a new CSS file for StudentChoiceForm */
+  .student-choice-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    height: 100vh; /* Full viewport height */
+    margin: 0%;
+    background-color: #f8f9fa; /* Optional: Set a background color */
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+
+  }
+  
+  .student-choice-form h1 {
+    margin-bottom: var(--spacing-lg); /* Space below the title */
+  }
+  
+  .student-choice-form .form-container {
+    width: 100%; /* Full width */
+    max-width: 800px; /* Optional: Limit max width */
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-color);
+  }
+  
+  .button-primary:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 4px rgba(38, 208, 206, 0.5); /* Focus effect */
+  }
+
+  .availability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .availability-card {
+    padding: var(--spacing-md);
+    text-align: center;
+  }
+
+  .availability-input {
+    width: 80px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: var(--spacing-sm);
+  }
+
+  .availability-input:focus {
+    border-color: var(--accent-color);
+    outline: none;
+  }
+
+  .create-user-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: var(--spacing-md);
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 16px;
+  }
+
+  .input-field:focus {
+    border-color: var(--accent-color);
+    outline: none;
+  }
+
+  .button-secondary {
+    background-color: var(--error-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .button-secondary:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+  }
