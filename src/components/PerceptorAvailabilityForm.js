@@ -18,7 +18,7 @@ const PerceptorAvailabilityForm = () => {
 
         try {
             const response = await axios.put(
-                `http://127.0.0.1:8000/update_preceptor_availability/${preceptorId}`,
+                `http://127.0.0.1:8000/crud/update_preceptor_availability/${preceptorId}`,
                 {
                     preceptorid: preceptorId,
                     availability: availability

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "./navbar.js";
 import "../styles/theme.css";
 import PerceptorAvailabilityForm from "./PerceptorAvailabilityForm.js";
+import ViewPreceptorSchedule from "./ViewPreceptorSchedule.js";
 
 const PerceptorDashboard = () => {
   const [preceptorData, setPreceptorData] = useState(null);
@@ -42,6 +43,8 @@ const PerceptorDashboard = () => {
     switch (currentView) {
       case "choices":
         return <PerceptorAvailabilityForm />;
+      case "schedule":
+        return <ViewPreceptorSchedule />;
       case "dashboard":
       default:
         return (

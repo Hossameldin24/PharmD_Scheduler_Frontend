@@ -4,6 +4,7 @@ import { useNavigate, Routes, Route } from "react-router-dom";
 import "../styles/theme.css";
 import Navbar from "./navbar.js";
 import StudentChoiceForm from "./StudentChoiceForm.js";
+import ViewStudentSchedule from "./ViewStudentSchedule.js";
 
 const StudentDashboard = () => {
     const [studentData, setStudentData] = useState(null);
@@ -61,6 +62,8 @@ const StudentDashboard = () => {
         switch (currentView) {
             case "choices":
                 return <StudentChoiceForm />;
+            case "schedule":
+                return <ViewStudentSchedule />;
             case "dashboard":
             default:
                 return (

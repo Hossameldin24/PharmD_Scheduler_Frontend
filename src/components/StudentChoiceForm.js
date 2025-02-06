@@ -4,13 +4,9 @@ import "../styles/theme.css";
 
 const StudentChoiceForm = () => {
     // Initialize state with all possible choices
-    const [choices, setChoices] = useState({
-        ...Array.from({ length: 8 }, (_, i) => 
-            Array.from({ length: 4 }, (_, j) => ({
-                [`Rotation${i + 1}Choice${j + 1}`]: ''
-            }))
-        ).reduce((acc, curr) => ({ ...acc, ...curr.reduce((a, b) => ({ ...a, ...b }), {}) }), {})
-    });
+    const [choices, setChoices] = useState(
+        Array.from({ length: 8 }, () => Array.from({ length: 4 }, () => ""))
+      );
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -44,11 +40,8 @@ const StudentChoiceForm = () => {
 
         try {
             const response = await axios.put(
-                `http://127.0.0.1:8000/update_student_choices/${studentId}`,
-                {
-                    studentid: studentId,
-                    ...choices
-                },
+                `http://127.0.0.1:8000/crud/update_student_choices/${studentId}`,
+                choices,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,

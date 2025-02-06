@@ -10,7 +10,7 @@ const CreateUserForm = () => {
         password: '',
         firstname: '',
         lastname: '',
-        speciality: '',
+        speciality_id: '',
         isAdmin: false,
     });
     const [loading, setLoading] = useState(false);
@@ -29,19 +29,31 @@ const CreateUserForm = () => {
         setLoading(true);
         setError('');
         setSuccess('');
-
         try {
             const endpoint = userType === 'student' 
-                ? 'http://127.0.0.1:8000/auth/register/student'
-                : 'http://127.0.0.1:8000/auth/register/preceptor';
-
-            const response = await axios.post(endpoint, formData, {
+                ? 'http://127.0.0.1:8000/crud/insert_student'
+                : 'http://127.0.0.1:8000/crud/add_preceptor';
+            
+            // Prepare data with correct parameter names
+            const submitData = {
+                ...(userType === 'student' 
+                    ? { student_id: formData.id }
+                    : { preceptor_id: formData.id }),
+                email: formData.email,
+                password: formData.password,
+                firstname: formData.firstname,
+                lastname: formData.lastname,
+                ...(userType != 'student' 
+                    ? { isAdmin: formData.isAdmin } : {}),
+            };
+    
+            const response = await axios.post(endpoint, submitData, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                     'Content-Type': 'application/json'
                 }
             });
-
+            
             setSuccess(`${userType} created successfully!`);
             setFormData({
                 id: '',
@@ -56,6 +68,7 @@ const CreateUserForm = () => {
             setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to create user');
+            console.error('Full error:', err.response); // Log full error for debugging
         } finally {
             setLoading(false);
         }
@@ -155,8 +168,8 @@ const CreateUserForm = () => {
                                     <div className="form-group">
                                         <label>Speciality</label>
                                         <select
-                                            value={formData.speciality}
-                                            onChange={(e) => setFormData({...formData, speciality: e.target.value})}
+                                            value={formData.speciality_id}
+                                            onChange={(e) => setFormData({...formData, speciality_id: e.target.value})}
                                             required
                                             className="input-field"
                                         >

@@ -23,7 +23,12 @@ const Navbar = ({ setCurrentView, userType = 'student' }) => {
                 </li>
                 <li>
                     <button className="button-primary" onClick={() => setCurrentView("choices")}>
-                        {userType === 'preceptor' ? 'Update Availability' : 'Update Choices'}
+                        {userType === 'student' ? 'Update Choices' : 'Update Availability'}
+                    </button>
+                </li>
+                <li>
+                    <button className="button-primary" onClick={() => setCurrentView("schedule")}>
+                        View Schedule
                     </button>
                 </li>
                 {userType === 'admin' && (
