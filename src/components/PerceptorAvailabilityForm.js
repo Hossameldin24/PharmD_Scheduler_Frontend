@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import "../styles/theme.css";
 
-const PerceptorAvailabilityForm = () => {
+const PreceptorAvailabilityForm = () => {
     const [availability, setAvailability] = useState(Array(8).fill(0));
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-
-    const preceptorId = localStorage.getItem('preceptor_id');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,12 +15,9 @@ const PerceptorAvailabilityForm = () => {
         setSuccess('');
 
         try {
-            const response = await axios.put(
-                `http://127.0.0.1:8000/crud/update_preceptor_availability/${preceptorId}`,
-                {
-                    preceptorid: preceptorId,
-                    availability: availability
-                },
+            await axios.put(
+                'http://127.0.0.1:8000/crud/preceptor/availability',
+                availability,
                 {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
@@ -109,4 +104,4 @@ const PerceptorAvailabilityForm = () => {
     );
 };
 
-export default PerceptorAvailabilityForm; 
+export default PreceptorAvailabilityForm;

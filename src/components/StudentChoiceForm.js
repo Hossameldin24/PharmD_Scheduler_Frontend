@@ -3,34 +3,36 @@ import axios from 'axios';
 import "../styles/theme.css";
 
 const StudentChoiceForm = () => {
-    // Initialize state with all possible choices
+    // Initialize state for choices (using speciality IDs)
     const [choices, setChoices] = useState(
-        Array.from({ length: 8 }, () => Array.from({ length: 4 }, () => ""))
-      );
-
+        Array(8).fill().map(() => Array(4).fill(""))
+    );
+    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-
-    // Get student ID from localStorage or context
-    const studentId = localStorage.getItem('student_id');
-
-    const departments = [
-        'Ambulatory Care',
-        'Cardiology',
-        'Critical Care',
-        'Emergency Medicine',
-        'Family Medicine',
-        'General Medicine',
-        'Geriatrics',
-        'Infectious Disease',
-        'Internal Medicine',
-        'Neurology',
-        'Oncology',
-        'Pediatrics',
-        'Psychiatry',
-        'Surgery'
-    ];
+    const [specialities, setSpecialities] = useState([]);
+    
+    // Fetch specialities on component mount
+    useEffect(() => {
+        const fetchSpecialities = async () => {
+            try {
+                const response = await axios.get(
+                    'http://127.0.0.1:8000/crud/get_all_specialities',
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
+                    }
+                );
+                setSpecialities(response.data);
+            } catch (err) {
+                setError('Failed to fetch specialities');
+            }
+        };
+        
+        fetchSpecialities();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,8 +41,8 @@ const StudentChoiceForm = () => {
         setSuccess('');
 
         try {
-            const response = await axios.put(
-                `http://127.0.0.1:8000/crud/update_student_choices/${studentId}`,
+            await axios.put(
+                'http://127.0.0.1:8000/crud/student/choices',
                 choices,
                 {
                     headers: {
@@ -59,27 +61,26 @@ const StudentChoiceForm = () => {
         }
     };
 
-    const handleChange = (rotation, choice, value) => {
-        setChoices(prev => ({
-            ...prev,
-            [`Rotation${rotation}Choice${choice}`]: value
-        }));
+    const handleChange = (rotationIndex, choiceIndex, specialityId) => {
+        const newChoices = [...choices];
+        newChoices[rotationIndex][choiceIndex] = specialityId;
+        setChoices(newChoices);
     };
 
-    const renderRotationChoices = (rotationNumber) => (
+    const renderRotationChoices = (rotationIndex) => (
         <div className="card" style={{ marginBottom: 'var(--spacing-lg)' }}>
             <h3 style={{ 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--spacing-md)',
                 fontFamily: 'var(--font-heading)'
             }}>
-                Rotation {rotationNumber}
+                Rotation {rotationIndex + 1}
             </h3>
             <div style={{ display: 'grid', gap: 'var(--spacing-md)' }}>
-                {[1, 2, 3, 4].map(choiceNum => (
-                    <div key={`Rotation${rotationNumber}Choice${choiceNum}`}>
+                {[0, 1, 2, 3].map(choiceIndex => (
+                    <div key={`rotation${rotationIndex}choice${choiceIndex}`}>
                         <label 
-                            htmlFor={`Rotation${rotationNumber}Choice${choiceNum}`}
+                            htmlFor={`rotation${rotationIndex}choice${choiceIndex}`}
                             style={{ 
                                 display: 'block', 
                                 marginBottom: 'var(--spacing-xs)',
@@ -87,17 +88,19 @@ const StudentChoiceForm = () => {
                                 fontWeight: '500'
                             }}
                         >
-                            Choice {choiceNum}
+                            Choice {choiceIndex + 1}
                         </label>
                         <select
-                            id={`Rotation${rotationNumber}Choice${choiceNum}`}
-                            value={choices[`Rotation${rotationNumber}Choice${choiceNum}`]}
-                            onChange={(e) => handleChange(rotationNumber, choiceNum, e.target.value)}
+                            id={`rotation${rotationIndex}choice${choiceIndex}`}
+                            value={choices[rotationIndex][choiceIndex]}
+                            onChange={(e) => handleChange(rotationIndex, choiceIndex, e.target.value)}
                             className="input-field"
                         >
-                            <option value="">Select Department</option>
-                            {departments.map(dept => (
-                                <option key={dept} value={dept}>{dept}</option>
+                            <option value="">Select Speciality</option>
+                            {specialities.map(spec => (
+                                <option key={spec._id} value={spec._id}>
+                                    {spec.speciality}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -117,7 +120,7 @@ const StudentChoiceForm = () => {
                         color: 'var(--text-primary)',
                         fontFamily: 'var(--font-body)'
                     }}>
-                        Please select your preferred departments for each rotation.
+                        Please select your preferred specialities for each rotation.
                         Rank your choices from 1 (most preferred) to 4 (least preferred).
                     </p>
                 </div>
@@ -140,7 +143,7 @@ const StudentChoiceForm = () => {
                         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                         gap: 'var(--spacing-lg)'
                     }}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(rotationNum => renderRotationChoices(rotationNum))}
+                        {Array.from({ length: 8 }, (_, i) => renderRotationChoices(i))}
                     </div>
                     
                     <button 
@@ -160,4 +163,4 @@ const StudentChoiceForm = () => {
     );
 };
 
-export default StudentChoiceForm; 
+export default StudentChoiceForm;

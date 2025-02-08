@@ -1,59 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../styles/theme.css";
 
 const CreateUserForm = () => {
     const [userType, setUserType] = useState('');
+    const [specialties, setSpecialties] = useState([]);
     const [formData, setFormData] = useState({
         id: '',
         email: '',
         password: '',
         firstname: '',
         lastname: '',
-        speciality_id: '',
+        specialityId: '',
         isAdmin: false,
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
-    const departments = [
-        'Ambulatory Care', 'Cardiology', 'Critical Care',
-        'Emergency Medicine', 'Family Medicine', 'General Medicine',
-        'Geriatrics', 'Infectious Disease', 'Internal Medicine',
-        'Neurology', 'Oncology', 'Pediatrics', 'Psychiatry', 'Surgery'
-    ];
+    useEffect(() => {
+        const fetchSpecialties = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/crud/get_all_specialities', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                setSpecialties(response.data);
+            } catch (err) {
+                console.error('Failed to fetch specialties:', err);
+            }
+        };
+        fetchSpecialties();
+    }, []);
+
+    useEffect(() => {
+        if (success) {
+            setShowSuccess(true);
+            const timer = setTimeout(() => {
+                setShowSuccess(false);
+                setSuccess('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
         setSuccess('');
+
         try {
-            const endpoint = userType === 'student' 
+            const endpoint = userType === 'student'
                 ? 'http://127.0.0.1:8000/crud/insert_student'
                 : 'http://127.0.0.1:8000/crud/add_preceptor';
-            
-            // Prepare data with correct parameter names
-            const submitData = {
-                ...(userType === 'student' 
-                    ? { student_id: formData.id }
-                    : { preceptor_id: formData.id }),
-                email: formData.email,
-                password: formData.password,
-                firstname: formData.firstname,
-                lastname: formData.lastname,
-                ...(userType != 'student' 
-                    ? { isAdmin: formData.isAdmin } : {}),
-            };
-    
-            const response = await axios.post(endpoint, submitData, {
+
+            const formDataObj = new FormData();
+
+            if (userType === 'student') {
+                formDataObj.append('studentId', formData.id);
+            } else {
+                formDataObj.append('preceptorId', formData.id);
+                formDataObj.append('specialityId', formData.specialityId);
+                formDataObj.append('isAdmin', formData.isAdmin);
+            }
+
+            formDataObj.append('firstname', formData.firstname);
+            formDataObj.append('lastname', formData.lastname);
+            formDataObj.append('email', formData.email);
+            formDataObj.append('password', formData.password);
+
+            const response = await axios.post(endpoint, formDataObj, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data'
                 }
             });
-            
+
             setSuccess(`${userType} created successfully!`);
             setFormData({
                 id: '',
@@ -61,37 +86,33 @@ const CreateUserForm = () => {
                 password: '',
                 firstname: '',
                 lastname: '',
-                speciality: '',
+                specialityId: '',
                 isAdmin: false,
             });
             setUserType('');
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err) {
-            setError(err.response?.data?.detail || 'Failed to create user');
-            console.error('Full error:', err.response); // Log full error for debugging
+            const errorMessage = err.response?.data?.detail;
+            setError(Array.isArray(errorMessage) ? errorMessage[0]?.msg : errorMessage || 'Failed to create user');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="page-container">
-            <div className="content-box">
-                <h1 className="page-title">Create New User</h1>
-
+        <div className="container">
+            <div className="form-container" style={{ position: 'relative' }}> {/* Add relative positioning */}
+                <h2>Create New User</h2>
                 {error && (
-                    <div className="status-badge status-error">
-                        {error}
+                    <div className="error-message">
+                        {typeof error === 'string' ? error : 'An error occurred'}
                     </div>
                 )}
-                
-                {success && (
-                    <div className="status-badge status-success">
+                {showSuccess && (
+                    <div className={`success-notification ${!showSuccess ? 'hide' : ''}`}>
                         {success}
                     </div>
                 )}
-
-                <form onSubmit={handleSubmit} className="create-user-form">
+                <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>User Type</label>
                         <select
@@ -105,7 +126,6 @@ const CreateUserForm = () => {
                             <option value="preceptor">Preceptor</option>
                         </select>
                     </div>
-
                     {userType && (
                         <>
                             <div className="form-group">
@@ -118,7 +138,6 @@ const CreateUserForm = () => {
                                     className="input-field"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>Email</label>
                                 <input
@@ -129,7 +148,6 @@ const CreateUserForm = () => {
                                     className="input-field"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>Password</label>
                                 <input
@@ -140,7 +158,6 @@ const CreateUserForm = () => {
                                     className="input-field"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>First Name</label>
                                 <input
@@ -151,7 +168,6 @@ const CreateUserForm = () => {
                                     className="input-field"
                                 />
                             </div>
-
                             <div className="form-group">
                                 <label>Last Name</label>
                                 <input
@@ -162,50 +178,43 @@ const CreateUserForm = () => {
                                     className="input-field"
                                 />
                             </div>
-
                             {userType === 'preceptor' && (
                                 <>
                                     <div className="form-group">
                                         <label>Speciality</label>
                                         <select
-                                            value={formData.speciality_id}
-                                            onChange={(e) => setFormData({...formData, speciality_id: e.target.value})}
+                                            value={formData.specialityId}
+                                            onChange={(e) => setFormData({...formData, specialityId: e.target.value})}
                                             required
                                             className="input-field"
                                         >
-                                            <option value="">Select Department</option>
-                                            {departments.map(dept => (
-                                                <option key={dept} value={dept}>{dept}</option>
+                                            <option value="">Select Speciality</option>
+                                            {specialties.map(specialty => (
+                                                <option key={specialty._id} value={specialty._id}>
+                                                    {specialty.speciality}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>
-
-                                    <div className="form-group">
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.isAdmin}
-                                                onChange={(e) => setFormData({...formData, isAdmin: e.target.checked})}
-                                            />
-                                            Is Admin
-                                        </label>
+                                    <div className="form-group checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.isAdmin}
+                                            onChange={(e) => setFormData({...formData, isAdmin: e.target.checked})}
+                                        />
+                                        <label>Is Admin</label>
                                     </div>
                                 </>
                             )}
+                            <button type="submit" className="submit-button button-secondary" disabled={loading}>
+                                {loading ? 'Creating User...' : 'Create User'}
+                            </button>
                         </>
                     )}
-
-                    <button 
-                        type="submit" 
-                        className="button-primary"
-                        disabled={loading || !userType}
-                    >
-                        {loading ? 'Creating User...' : 'Create User'}
-                    </button>
                 </form>
             </div>
         </div>
     );
 };
 
-export default CreateUserForm; 
+export default CreateUserForm;

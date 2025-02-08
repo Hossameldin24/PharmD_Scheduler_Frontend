@@ -324,3 +324,45 @@
     background-color: #c0392b;
     transform: translateY(-2px);
   }
+
+/* Success Notification Animation */
+@keyframes slideIn {
+  from {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+      opacity: 1;
+      transform: translateY(0);
+  }
+  to {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+}
+
+.success-notification {
+  position: absolute; /* Changed from fixed to absolute */
+  top: -60px; /* Position above the form */
+  left: 50%; /* Center horizontally */
+  background-color: #4CAF50; /* Modern green */
+  color: white;
+  padding: 15px 25px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.5s ease-out;
+  z-index: 1000;
+  text-align: center;
+  width: max-content; /* Ensure the width fits the content */
+}
+
+.success-notification.hide {
+  animation: slideOut 0.5s ease-out;
+}

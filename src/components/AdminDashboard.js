@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "./navbar.js";
 import "../styles/theme.css";
 import CreateUserForm from "./CreateUserForm.js";
+import PerceptorAvailabilityForm from "./PerceptorAvailabilityForm.js";
+import ViewAdminSchedules from "./ViewAdminSchedules.js";
 
 const AdminDashboard = () => {
     const [adminData, setAdminData] = useState(null);
@@ -41,6 +43,10 @@ const AdminDashboard = () => {
         switch (currentView) {
             case "create-user":
                 return <CreateUserForm />;
+            case "choices":
+                return <PerceptorAvailabilityForm />;
+            case "schedule":
+                return <ViewAdminSchedules />;
             case "dashboard":
             default:
                 return (
@@ -95,7 +101,7 @@ const AdminDashboard = () => {
             <div className="content-box">
                 {currentView === "dashboard" && (
                     <h1 className="page-title">
-                        Welcome, {adminData.firstname} {adminData.lastname}
+                        Welcome, Dr. {adminData.firstname} {adminData.lastname}
                     </h1>
                 )}
                 {renderContent()}
