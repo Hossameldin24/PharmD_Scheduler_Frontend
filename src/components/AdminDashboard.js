@@ -6,6 +6,7 @@ import "../styles/theme.css";
 import CreateUserForm from "./CreateUserForm.js";
 import PerceptorAvailabilityForm from "./PerceptorAvailabilityForm.js";
 import ViewAdminSchedules from "./ViewAdminSchedules.js";
+import PreceptorEvaluationForm from "./PreceptorEvaluationForm.js";
 
 const AdminDashboard = () => {
     const [adminData, setAdminData] = useState(null);
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
         const fetchAdminData = async () => {
             const token = localStorage.getItem("access_token");
             if (!token) {
-                navigate("/login");
+                navigate("/");
                 return;
             }
 
@@ -47,6 +48,8 @@ const AdminDashboard = () => {
                 return <PerceptorAvailabilityForm />;
             case "schedule":
                 return <ViewAdminSchedules />;
+            case "forms":
+                return <PreceptorEvaluationForm />
             case "dashboard":
             default:
                 return (
