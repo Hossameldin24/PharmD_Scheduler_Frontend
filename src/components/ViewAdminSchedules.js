@@ -16,6 +16,11 @@ const ViewAdminSchedules = () => {
     const [editingRotation, setEditingRotation] = useState(null);
     const [availablePreceptors, setAvailablePreceptors] = useState([]);
     const [newSchedule, setNewSchedule] = useState([]);
+    const [years, setYears] = useState([]);
+    const [selectedYear, setSelectedYear] = useState('');
+    const [schedulesByYear, setSchedulesByYear] = useState({});
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [success, setSuccess] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,13 +42,13 @@ const ViewAdminSchedules = () => {
         fetchData();
     }, []);
 
-    // Reset selectedId when selectedType changes
     useEffect(() => {
         if (selectedType) {
-            setSelectedId(''); // Reset selected ID
-            setSchedule([]);   // Clear schedule data
-            setDisplaySchedule([]); // Clear display schedule
-            setError(''); // Clear any previous errors
+            setSelectedId('');
+            setSelectedYear('');
+            setSchedule([]);
+            setDisplaySchedule([]);
+            setError('');
         }
     }, [selectedType]);
 
@@ -61,6 +66,7 @@ const ViewAdminSchedules = () => {
     const handleEditMode = () => {
         setIsEditing(true);
         fetchPreceptorsWithSpecialities();
+        setNewSchedule(Array(schedule.length).fill([]));
     };
 
     const handleEdit = (rotationIndex) => {
@@ -69,19 +75,29 @@ const ViewAdminSchedules = () => {
     };
 
     const handlePreceptorChange = (rotationIndex, preceptorId, specialityId) => {
+        // Check if the selected preceptor is different from the current one
+        const currentRotation = schedule[rotationIndex];
+        const isPreceptorChanged = currentRotation.preceptor._id !== preceptorId
+        
+        // Create a copy of the current newSchedule
         const updatedSchedule = [...newSchedule];
-        updatedSchedule[rotationIndex] = [preceptorId, specialityId];
+        
+        if (isPreceptorChanged) {
+            // Only update newSchedule if there's a change
+            updatedSchedule[rotationIndex] = [preceptorId, specialityId];
+        } else {
+            // If no change, set empty array at this index
+            updatedSchedule[rotationIndex] = [];
+        }
         setNewSchedule(updatedSchedule);
         
-        // Find the preceptor and speciality data
+        // Update display schedule regardless of whether there's a change
         const specialityData = availablePreceptors[rotationIndex][specialityId];
         if (specialityData) {
             const selectedPreceptor = specialityData.preceptors.find(p => p._id === preceptorId);
             
             if (selectedPreceptor) {
-                // Create a copy of displaySchedule
                 const updatedDisplaySchedule = [...displaySchedule];
-                // Update with new preceptor info
                 updatedDisplaySchedule[rotationIndex] = {
                     ...updatedDisplaySchedule[rotationIndex],
                     preceptor: {
@@ -99,21 +115,75 @@ const ViewAdminSchedules = () => {
             }
         }
         
-        setEditingRotation(null); // Close the rotation editor after selection
+        setEditingRotation(null);
     };
 
     const handleSaveChanges = async () => {
         try {
-            await axiosInstance.put('/crud/update_student_preceptors/', {
-                student_id: selectedId,
-                newSched: newSchedule
+            // Initialize an array of 8 empty arrays
+            const rotationChanges = Array(8).fill().map(() => []);
+            
+            // Fill in the changes where preceptors were modified
+            newSchedule.forEach((rotation, index) => {
+                if (rotation.length === 2) {
+                    // Convert IDs to strings to match the endpoint's expected type
+                    rotationChanges[index] = [String(rotation[0]), String(rotation[1])];
+                } else {
+                    // Explicitly set empty array for unchanged rotations
+                    rotationChanges[index] = [];
+                }
             });
+    
+            // Check if any changes were made
+            const hasChanges = rotationChanges.some(rotation => rotation.length > 0);
+            
+            if (!hasChanges) {
+                setError('No changes to save');
+                return;
+            }
+    
+            if (!selectedYear) {
+                setError('Please select a year before saving changes');
+                return;
+            }
+    
+            console.log("StudentID:", selectedId);
+            console.log("Year:", selectedYear);
+            console.log("Changes to be sent:", rotationChanges);
+    
+            // Append parameters to URL
+            const url = `/crud/update_student_preceptors?student_id=${selectedId}&year=${selectedYear}`;
+            
+            const response = await axiosInstance.put(
+                url,
+                rotationChanges  // Send newSched as the request body
+            );
+    
             setIsEditing(false);
             setEditingRotation(null);
-            // Refresh schedule
+            setError('');
             fetchSchedule(selectedId, 'student');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Failed to update schedule');
+            let errorMessage = 'Failed to update schedule';
+            
+            if (err.response) {
+                console.error("Error response:", err.response.data);
+                const responseError = err.response.data;
+                
+                if (typeof responseError === 'string') {
+                    errorMessage = responseError;
+                } else if (responseError.detail) {
+                    errorMessage = responseError.detail;
+                } else if (responseError.msg) {
+                    errorMessage = responseError.msg;
+                } else if (Array.isArray(responseError)) {
+                    errorMessage = responseError.map(e => e.msg || e.message || e).join(', ');
+                } else if (typeof responseError === 'object') {
+                    errorMessage = Object.values(responseError).flat().join(', ');
+                }
+            }
+            
+            setError(errorMessage);
         }
     };
 
@@ -130,12 +200,24 @@ const ViewAdminSchedules = () => {
                 
             const response = await axiosInstance.get(`/crud${endpoint}`);
             
-            setSchedule(response.data);
-            setDisplaySchedule(response.data); // Initialize display schedule with fetched data
+            // Store all schedules by year
+            setSchedulesByYear(response.data);
+            // Get available years and sort them
+            const availableYears = Object.keys(response.data).sort((a, b) => b - a); // Sort descending
+            setYears(availableYears);
+            
+            // Set most recent year as default if no year is selected
+            if (!selectedYear && availableYears.length > 0) {
+                setSelectedYear(availableYears[0]);
+                setSchedule(response.data[availableYears[0]]);
+                setDisplaySchedule(response.data[availableYears[0]]);
+            } else if (selectedYear && response.data[selectedYear]) {
+                setSchedule(response.data[selectedYear]);
+                setDisplaySchedule(response.data[selectedYear]);
+            }
             
             if (type === 'student') {
-                // Initialize newSchedule array with empty arrays for each rotation
-                setNewSchedule(Array(response.data.length).fill([]));
+                setNewSchedule(Array(response.data[selectedYear]?.length || 0).fill([]));
             }
             
             setIsEditing(false);
@@ -149,27 +231,37 @@ const ViewAdminSchedules = () => {
         }
     };
 
-    // Only fetch when both type and id are selected
     useEffect(() => {
         if (selectedId && selectedType) {
             fetchSchedule(selectedId, selectedType);
         }
-    }, [selectedId]);  // Only depend on selectedId, not on selectedType
+    }, [selectedId]);
 
-    // Handle type selector change
     const handleTypeChange = (e) => {
         const newType = e.target.value;
         setSelectedType(newType);
-        setSelectedId(''); // Clear selected ID immediately
-        setSchedule([]);   // Clear schedule data
-        setDisplaySchedule([]); // Clear display schedule
-        setError(''); // Clear any previous errors
+        setSelectedId('');
+        setSchedule([]);
+        setDisplaySchedule([]);
+        setError('');
     };
 
-    // Handle id selector change
     const handleIdChange = (e) => {
         const newId = e.target.value;
         setSelectedId(newId);
+        setSelectedYear('');
+    };
+
+    const handleYearChange = (e) => {
+        const newYear = e.target.value;
+        setSelectedYear(newYear);
+        if (schedulesByYear[newYear]) {
+            setSchedule(schedulesByYear[newYear]);
+            setDisplaySchedule(schedulesByYear[newYear]);
+            if (selectedType === 'student') {
+                setNewSchedule(Array(schedulesByYear[newYear].length).fill([]));
+            }
+        }
     };
 
     return (
@@ -177,7 +269,8 @@ const ViewAdminSchedules = () => {
             <div className="content-box">
                 <h1 className="page-title">View Schedules</h1>
                 
-                {error && <div className="status-error">{error}</div>}
+                {error && <div className="status-error" role="alert">{error}</div>}
+                {success && <div className="status-success" role="alert">{success}</div>}
                 
                 <div className="schedule-controls">
                     <select
@@ -200,6 +293,21 @@ const ViewAdminSchedules = () => {
                             {(selectedType === 'student' ? students : preceptors).map(user => (
                                 <option key={user._id} value={user._id}>
                                     {user.firstname} {user.lastname}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+
+                    {selectedId && years.length > 0 && (
+                        <select
+                            value={selectedYear}
+                            onChange={handleYearChange}
+                            className="select-control"
+                        >
+                            <option value="">Select Year</option>
+                            {years.map(year => (
+                                <option key={year} value={year}>
+                                    {year}
                                 </option>
                             ))}
                         </select>
@@ -237,7 +345,7 @@ const ViewAdminSchedules = () => {
                                             onClick={() => {
                                                 setIsEditing(false);
                                                 setEditingRotation(null);
-                                                setDisplaySchedule(schedule); // Reset display to original
+                                                setDisplaySchedule(schedule);
                                             }}
                                         >
                                             Cancel
@@ -279,7 +387,6 @@ const ViewAdminSchedules = () => {
                                     </table>
                                 </div>
 
-                                {/* Preceptor selection modal */}
                                 {editingRotation !== null && (
                                     <div className="modal-overlay">
                                         <div className="modal-content">
@@ -291,20 +398,20 @@ const ViewAdminSchedules = () => {
                                                         {data.preceptors.map((preceptor, pIndex) => (
                                                             <div key={pIndex} className="preceptor-option">
                                                                 <label 
-                                                                    htmlFor={`preceptor-${editingRotation}-${preceptor._id}`}
+                                                                    htmlFor={`preceptor-${editingRotation}-${preceptor.id}`}
                                                                     className="preceptor-label"
-                                                                    onClick={() => handlePreceptorChange(editingRotation, preceptor._id, specialityId)}
+                                                                    onClick={() => handlePreceptorChange(editingRotation, preceptor.id, specialityId)}
                                                                 >
                                                                     <input
                                                                         type="radio"
                                                                         name={`rotation-${editingRotation}`}
-                                                                        id={`preceptor-${editingRotation}-${preceptor._id}`}
-                                                                        onChange={() => {}} // Empty as we're handling with onClick
-                                                                        checked={newSchedule[editingRotation]?.[0] === preceptor._id && 
+                                                                        id={`preceptor-${editingRotation}-${preceptor.id}`}
+                                                                        onChange={() => {}}
+                                                                        checked={newSchedule[editingRotation]?.[0] === preceptor.id && 
                                                                                 newSchedule[editingRotation]?.[1] === specialityId}
                                                                     />
                                                                     <span className="preceptor-name">
-                                                                        Dr. {preceptor.firstname} {preceptor.lastname}
+                                                                        {preceptor.id} Dr. {preceptor.firstname} {preceptor.lastname}
                                                                         <span className="availability-tag">
                                                                             Available: {preceptor.rotationAvailability}
                                                                         </span>
