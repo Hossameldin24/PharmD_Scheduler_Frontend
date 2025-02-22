@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from '../utils/axiosConfig';
 import logo from "../qatarUniLogo4.png";
 import "../styles/LoginForm.css";
 
@@ -21,15 +21,11 @@ const LoginForm = () => {
       formData.append("username", username);
       formData.append("password", password);
 
-      const loginResponse = await axios.post(
-        "http://127.0.0.1:8000/auth/token",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
+      const loginResponse = await axiosInstance.post("/auth/token", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
 
       const { access_token, role, isAdmin } = loginResponse.data;
       localStorage.setItem("access_token", access_token);

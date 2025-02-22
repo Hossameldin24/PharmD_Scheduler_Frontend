@@ -5,6 +5,7 @@ import Navbar from "./navbar.js";
 import "../styles/theme.css";
 import PerceptorAvailabilityForm from "./PerceptorAvailabilityForm.js";
 import ViewPreceptorSchedule from "./ViewPreceptorSchedule.js";
+import PreceptorEvaluationForm from "./PreceptorEvaluationForm.js";
 
 const PreceptorDashboard = () => {
   const [preceptorData, setPreceptorData] = useState(null);
@@ -89,6 +90,8 @@ const PreceptorDashboard = () => {
         return <PerceptorAvailabilityForm />;
       case "schedule":
         return <ViewPreceptorSchedule />;
+      case "forms":
+        return <PreceptorEvaluationForm />;
       case "dashboard":
       default:
         return renderDashboardContent();

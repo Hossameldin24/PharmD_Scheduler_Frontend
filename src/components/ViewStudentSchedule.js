@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosConfig';
 import "../styles/theme.css";
 
 const ViewStudentSchedule = () => {
@@ -10,14 +10,7 @@ const ViewStudentSchedule = () => {
     useEffect(() => {
         const fetchSchedule = async () => {
             try {
-                const response = await axios.get(
-                    'http://127.0.0.1:8000/crud/student/schedule',
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                        }
-                    }
-                );
+                const response = await axiosInstance.get('/crud/student/schedule');
                 setSchedule(response.data);
             } catch (err) {
                 setError(err.response?.data?.detail || 'Failed to fetch schedule');

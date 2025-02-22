@@ -8,16 +8,17 @@ const StudentChoiceForm = () => {
         Array(8).fill().map(() => Array(4).fill(""))
     );
     
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true); // Start with loading true
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [specialities, setSpecialities] = useState([]);
     
-    // Fetch specialities on component mount
+    // Fetch specialities and existing choices on component mount
     useEffect(() => {
-        const fetchSpecialities = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(
+                // Fetch specialities
+                const specialitiesResponse = await axios.get(
                     'http://127.0.0.1:8000/crud/get_all_specialities',
                     {
                         headers: {
@@ -25,13 +26,30 @@ const StudentChoiceForm = () => {
                         }
                     }
                 );
-                setSpecialities(response.data);
+                setSpecialities(specialitiesResponse.data);
+                
+                // Fetch existing choices
+                const choicesResponse = await axios.get(
+                    'http://127.0.0.1:8000/crud/get_student_choices',
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
+                    }
+                );
+                
+                // If choices exist in the database, use them; otherwise, keep the default empty choices
+                if (choicesResponse.data && choicesResponse.data.length > 0) {
+                    setChoices(choicesResponse.data);
+                }
             } catch (err) {
-                setError('Failed to fetch specialities');
+                setError(err.response?.data?.detail || 'Failed to fetch data');
+            } finally {
+                setLoading(false);
             }
         };
         
-        fetchSpecialities();
+        fetchData();
     }, []);
 
     const handleSubmit = async (e) => {
@@ -92,7 +110,7 @@ const StudentChoiceForm = () => {
                         </label>
                         <select
                             id={`rotation${rotationIndex}choice${choiceIndex}`}
-                            value={choices[rotationIndex][choiceIndex]}
+                            value={choices[rotationIndex]?.[choiceIndex] || ""}
                             onChange={(e) => handleChange(rotationIndex, choiceIndex, e.target.value)}
                             className="input-field"
                         >
@@ -108,6 +126,19 @@ const StudentChoiceForm = () => {
             </div>
         </div>
     );
+
+    if (loading && specialities.length === 0) {
+        return (
+            <div className="page-container">
+                <div className="content-box">
+                    <h1 className="page-title">Rotation Preferences</h1>
+                    <div className="status-badge" style={{ textAlign: 'center' }}>
+                        Loading your preferences...
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="page-container">
