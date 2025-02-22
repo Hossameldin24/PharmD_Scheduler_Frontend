@@ -5,6 +5,7 @@ import "../styles/theme.css";
 import Navbar from "./navbar.js";
 import StudentChoiceForm from "./StudentChoiceForm.js";
 import ViewStudentSchedule from "./ViewStudentSchedule.js";
+import StudentAttendanceForm from "./StudentAttendanceForm.js"
 
 const StudentDashboard = () => {
     const [studentData, setStudentData] = useState(null);
@@ -64,6 +65,8 @@ const StudentDashboard = () => {
                 return <StudentChoiceForm />;
             case "schedule":
                 return <ViewStudentSchedule />;
+            case "forms":
+                return <StudentAttendanceForm />;
             case "dashboard":
             default:
                 return (
