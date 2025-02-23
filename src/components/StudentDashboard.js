@@ -77,7 +77,7 @@ const StudentDashboard = () => {
                                 <tbody>
                                     <tr>
                                         <th>Student ID</th>
-                                        <td>{studentData.studentid}</td>
+                                        <td>{studentData._id}</td>
                                     </tr>
                                     <tr>
                                         <th>Email</th>

@@ -10,7 +10,7 @@ const ViewStudentSchedule = () => {
     useEffect(() => {
         const fetchSchedule = async () => {
             try {
-                const response = await axiosInstance.get('/crud/student/schedule');
+                const response = await axiosInstance.get('/crud/student/get_latest_schedule');
                 setSchedule(response.data);
             } catch (err) {
                 setError(err.response?.data?.detail || 'Failed to fetch schedule');

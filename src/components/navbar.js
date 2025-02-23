@@ -24,21 +24,29 @@ const Navbar = ({ setCurrentView, userType = 'student' }) => {
                         Dashboard
                     </button>
                 </li>
-                <li>
-                    <button className="button-primary" onClick={() => setCurrentView("choices")}>
-                        {userType === 'student' ? 'Update Choices' : 'Update Availability'}
-                    </button>
-                </li>
+                {(userType !== 'admin') && (
+                    <>
+                        <li>
+                            <button className="button-primary" onClick={() => setCurrentView("choices")}>
+                                {userType === 'student' ? 'Update Choices' : 'Update Availability'}
+                            </button>
+                        </li>
+                    </>
+                )}
                 <li>
                     <button className="button-primary" onClick={() => setCurrentView("schedule")}>
                         View Schedule
                     </button>
                 </li>
-                <li>
-                    <button className="button-primary" onClick={() => setCurrentView("forms")}>
-                        {userType === 'student' ? 'Submit Attendance' : 'Student Evaluation'}
-                    </button>
-                </li>
+                {userType !== 'admin' && (
+                    <>
+                        <li>
+                            <button className="button-primary" onClick={() => setCurrentView("forms")}>
+                                {userType === 'student' ? 'Submit Attendance' : 'Student Evaluation'}
+                            </button>
+                        </li>
+                    </>
+                )}
                 {userType === 'admin' && (
                     <>
                         <li>

@@ -19,7 +19,6 @@ const ViewAdminSchedules = () => {
     const [years, setYears] = useState([]);
     const [selectedYear, setSelectedYear] = useState('');
     const [schedulesByYear, setSchedulesByYear] = useState({});
-    const [unsavedChanges, setUnsavedChanges] = useState(false);
     const [success, setSuccess] = useState('');
 
     useEffect(() => {

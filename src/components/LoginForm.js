@@ -32,8 +32,10 @@ const LoginForm = () => {
 
       if (role === "student") {
         navigate("/StudentDashboard");
-      } else if (role === "preceptor") {
-        console.log(isAdmin);
+      }else if (role === "admin") {
+        navigate("/standaloneAdminDashboard");
+      }
+      else if (role === "preceptor") {
         if(isAdmin){
           navigate("/AdminDashboard");
         }else{

@@ -8,7 +8,7 @@ import PerceptorAvailabilityForm from "./PerceptorAvailabilityForm.js";
 import ViewAdminSchedules from "./ViewAdminSchedules.js";
 import PreceptorEvaluationForm from "./PreceptorEvaluationForm.js";
 
-const AdminDashboard = () => {
+const StandaloneAdminDashboard = () => {
     const [adminData, setAdminData] = useState(null);
     const [error, setError] = useState("");
     const [currentView, setCurrentView] = useState("dashboard");
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
 
             try {
                 const response = await axios.get(
-                    "http://127.0.0.1:8000/auth/preceptor/dashboard",
+                    "http://127.0.0.1:8000/auth/admin/dashboard",
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -44,8 +44,6 @@ const AdminDashboard = () => {
         switch (currentView) {
             case "create-user":
                 return <CreateUserForm />;
-            case "choices":
-                return <PerceptorAvailabilityForm />;
             case "schedule":
                 return <ViewAdminSchedules />;
             case "forms":
@@ -68,7 +66,7 @@ const AdminDashboard = () => {
                                     </tr>
                                     <tr>
                                         <th>Role</th>
-                                        <td>Preceptor, Administrator</td>
+                                        <td>Standalone Administrator</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -113,4 +111,4 @@ const AdminDashboard = () => {
     );
 };
 
-export default AdminDashboard; 
+export default StandaloneAdminDashboard; 
